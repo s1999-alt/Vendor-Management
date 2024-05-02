@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Vendor , Purchase_Order
+from .models import Vendor , PurchaseOrder
 
 
 class VendorSerializer(serializers.ModelSerializer):
@@ -10,5 +10,7 @@ class VendorSerializer(serializers.ModelSerializer):
 
 class PurchaseOrderSerializer(serializers.ModelSerializer):
   class Meta:
-    model = Purchase_Order
-    fields = '__all__'    
+    model = PurchaseOrder
+    fields = '__all__'
+    extra_kwargs = {
+    'po_number': {'read_only': True}}

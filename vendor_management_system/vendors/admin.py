@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Vendor, Purchase_Order, HistoricalPerfomance
+from .models import Vendor, PurchaseOrder, HistoricalPerfomance
 
 admin.site.register(Vendor)
-admin.site.register(Purchase_Order)
+admin.site.register(PurchaseOrder)
 admin.site.register(HistoricalPerfomance)
