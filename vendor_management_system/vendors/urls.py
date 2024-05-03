@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import VendorListCreateAPIView, VendorRetrieveUpdateDestroyAPIView, PurchaseOrderListCreateAPIView, PurchaseOrderRetrieveUpdateDestroyAPIView, VendorPerformanceAPIView
+from .views import VendorListCreateAPIView, VendorRetrieveUpdateDestroyAPIView, PurchaseOrderListCreateAPIView, PurchaseOrderRetrieveUpdateDestroyAPIView, VendorPerformanceAPIView, MyObtainTokenPairView, LogoutView
 
 
 urlpatterns = [
@@ -13,4 +13,8 @@ urlpatterns = [
 
   # URL for retrieving vendor performance metrics
   path('vendors/<int:pk>/performance/', VendorPerformanceAPIView.as_view(), name='vendor-performance'),
+  
+
+  path('login/', MyObtainTokenPairView.as_view(), name='token_obtain_pair'),
+  path('logout/', LogoutView.as_view(), name='auth_logout'),
 ]

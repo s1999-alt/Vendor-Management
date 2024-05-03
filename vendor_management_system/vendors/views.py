@@ -1,33 +1,62 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 from .models import Vendor, PurchaseOrder
-from .serializers import VendorSerializer, PurchaseOrderSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import VendorSerializer, PurchaseOrderSerializer, MyTokenObtainPairSerializer
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.response import Response
+from rest_framework import status
 
+
+class MyObtainTokenPairView(TokenObtainPairView):
+    permission_classes = (permissions.AllowAny,)
+    serializer_class = MyTokenObtainPairSerializer
+    
+
+# Logout
+class LogoutView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh_token"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+  
+  
 # View for listing and creating vendors
 class VendorListCreateAPIView(generics.ListCreateAPIView):
+  permission_classes = [permissions.IsAuthenticated]
   queryset = Vendor.objects.all()
   serializer_class = VendorSerializer
 
 
 # View for retrieving, updating, and deleting vendors
 class VendorRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+  permission_classes = [permissions.IsAuthenticated]
   queryset = Vendor.objects.all()
   serializer_class = VendorSerializer
 
 
 # View for listing and creating purchase orders
 class PurchaseOrderListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderSerializer
 
 
 # View for retrieving, updating, and deleting purchase orders
 class PurchaseOrderRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderSerializer
 
 
 # View for retrieving vendor performance metrics
 class VendorPerformanceAPIView(generics.RetrieveAPIView):
+   permission_classes = [permissions.IsAuthenticated]
    queryset = Vendor.objects.all()
    serializer_class = VendorSerializer
    lookup_field = 'pk'
