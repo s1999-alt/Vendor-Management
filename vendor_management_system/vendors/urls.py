@@ -1,8 +1,12 @@
 from django.urls import path
-from .views import VendorListCreateAPIView, VendorRetrieveUpdateDestroyAPIView, PurchaseOrderListCreateAPIView, PurchaseOrderRetrieveUpdateDestroyAPIView, VendorPerformanceAPIView, MyObtainTokenPairView, LogoutView
+from .views import VendorListCreateAPIView, VendorRetrieveUpdateDestroyAPIView, PurchaseOrderListCreateAPIView, PurchaseOrderRetrieveUpdateDestroyAPIView, VendorPerformanceAPIView, MyObtainTokenPairView, LogoutView, AcknowledgePurchaseOrderAPIView
 
 
 urlpatterns = [
+  
+  path('login/', MyObtainTokenPairView.as_view(), name='token_obtain_pair'),
+  path('logout/', LogoutView.as_view(), name='auth_logout'),
+
   # URLs for managing vendors
   path('vendors/', VendorListCreateAPIView.as_view(), name='vendor-list-create'),
   path('vendors/<int:pk>/', VendorRetrieveUpdateDestroyAPIView.as_view(), name='vendor-retrieve-update-destroy'),
@@ -13,8 +17,8 @@ urlpatterns = [
 
   # URL for retrieving vendor performance metrics
   path('vendors/<int:pk>/performance/', VendorPerformanceAPIView.as_view(), name='vendor-performance'),
-  
 
-  path('login/', MyObtainTokenPairView.as_view(), name='token_obtain_pair'),
-  path('logout/', LogoutView.as_view(), name='auth_logout'),
+  # URL for acknowledging purchase orders
+  path('purchase_orders/<int:pk>/acknowledge/', AcknowledgePurchaseOrderAPIView.as_view(), name='acknowledge-purchase-order'),
+
 ]
