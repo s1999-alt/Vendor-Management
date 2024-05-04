@@ -342,7 +342,7 @@ class AcknowledgePurchaseOrderAPITestCase(APITestCase):
     def test_acknowledge_purchase_order_endpoint(self):
         self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.get_token())
         url = reverse('acknowledge-purchase-order', kwargs={'pk': self.purchase_order.pk})
-        response = self.client.post(url)
+        response = self.client.put(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.purchase_order.refresh_from_db()
         self.assertIsNotNone(self.purchase_order.acknowledgment_date)
