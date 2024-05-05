@@ -54,7 +54,8 @@ class Vendor(models.Model):
             return 0.0
         grace_period_days = 7
         on_time_deliveries = completed_pos.filter(
-            delivery_date__lte=models.F("issue_date") + timedelta(days=grace_period_days)
+            delivery_date__lte=models.F("issue_date")
+            + timedelta(days=grace_period_days)
         ).count()
         return (on_time_deliveries / total_completed_pos) * 100
 
@@ -95,8 +96,8 @@ class Vendor(models.Model):
 
 class PurchaseOrder(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('completed', 'Completed'),
+        ("pending", "Pending"),
+        ("completed", "Completed"),
     ]
     po_number = models.CharField(max_length=50, unique=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
@@ -128,7 +129,8 @@ class PurchaseOrder(models.Model):
 
     def __str__(self):
         return self.po_number
-    
+
+
 @receiver(post_save, sender=PurchaseOrder)
 def update_vendor_metrics(sender, instance, **kwargs):
     if instance.vendor_id:
@@ -136,7 +138,7 @@ def update_vendor_metrics(sender, instance, **kwargs):
         vendor.quality_rating_avg = vendor.calculate_quality_rating_average()
         vendor.average_response_time = vendor.calculate_average_response_time()
         vendor.fulfillment_rate = vendor.calculate_fulfillment_rate()
-    if instance.status == 'completed':
+    if instance.status == "completed":
         logger.info(f"Updating on-time delivery rate for vendor {instance.vendor.id}")
         on_time_rate = vendor.calculate_on_time_delivery_rate()
         logger.info(f"On-time delivery rate: {on_time_rate}")

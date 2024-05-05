@@ -108,9 +108,7 @@ class VendorAPITestCase(APITestCase):
 
     def test_retrieve_nonexistent_vendor_endpoint(self):
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + self.get_token())
-        url = reverse(
-            "vendor-retrieve-update-destroy", kwargs={"pk": 999}
-        ) 
+        url = reverse("vendor-retrieve-update-destroy", kwargs={"pk": 999})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -361,4 +359,3 @@ class AcknowledgePurchaseOrderAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.purchase_order.refresh_from_db()
         self.assertIsNotNone(self.purchase_order.acknowledgment_date)
-

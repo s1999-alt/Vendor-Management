@@ -33,7 +33,7 @@ urlpatterns = [
         PurchaseOrderRetrieveUpdateDestroyAPIView.as_view(),
         name="purchase-order-retrieve-update-destroy",
     ),
-     # New endpoint for listing purchase orders by vendor
+    # New endpoint for listing purchase orders by vendor
     path(
         "purchase_orders/by_vendor/<int:vendor_id>/",
         PurchaseOrderByVendorAPIView.as_view(),

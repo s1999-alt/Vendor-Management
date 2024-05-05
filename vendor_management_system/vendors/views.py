@@ -59,12 +59,14 @@ class PurchaseOrderRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAP
     queryset = PurchaseOrder.objects.all()
     serializer_class = PurchaseOrderSerializer
 
-#view for retrieving purchase orders by vendor
+
+# view for retrieving purchase orders by vendor
 class PurchaseOrderByVendorAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PurchaseOrderSerializer
+
     def get_queryset(self):
-        vendor_id = self.kwargs.get('vendor_id')
+        vendor_id = self.kwargs.get("vendor_id")
         return PurchaseOrder.objects.filter(vendor_id=vendor_id)
 
 
