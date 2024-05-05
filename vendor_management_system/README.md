@@ -97,7 +97,7 @@ After Login , We got an access token and refresh token, access token is required
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `name` | `string` | **Required**. Vendor name (Only alphabets are allowed)|
+| `name` | `string` | **Required**. Vendor name|
 | `contact_details ` | `string` | **Required**. Vendor's contact details |
 | `address` | `string` | **Required**. address |
 | `vendor_code` | `string` | **Required**. vendor_code |
@@ -168,7 +168,7 @@ After Login , We got an access token and refresh token, access token is required
 | `quantity` | `integer` | **Required**. Total quantity of items|
 | `status` | `string` | **Required**. Status of the purchase order |
 | `quality_rating` | `integer` |  Rating given to the vendor |
-| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) (choose issue date greater than or equal to order date and less than acknowledge date and also less than the delivery date) |
+| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) (issue date automatically generates with the current date and time, give order date less than the issue date and delivery date greater than than issue date(+7 days from order date)) |
 | `acknowledgment_date` | `string` | acknowledgment_date (YYYY-MM-DD) (acknowledge date is greater than the issue date and less than the delivery date ) |
 
 

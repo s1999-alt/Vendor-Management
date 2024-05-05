@@ -38,8 +38,10 @@ class Vendor(models.Model):
             raise ValidationError(
                 {"contact_details": "Contact details must contain exactly 10 digits."}
             )
-        if not self.name.isalpha():
-            raise ValidationError({"name": "Name must contain only alphabets."})
+        if not re.match(r"^[a-zA-Z\s]+$", self.name):
+            raise ValidationError(
+                {"name": "Name must contain only alphabetic characters and spaces."}
+            )
 
     def save(self, *args, **kwargs):
         self.full_clean()  # This will call the clean method
@@ -108,7 +110,7 @@ class PurchaseOrder(models.Model):
         null=True,
         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
     )
-    issue_date = models.DateTimeField()
+    issue_date = models.DateTimeField(auto_now_add=True)
     acknowledgment_date = models.DateTimeField(blank=True, null=True)
 
     def clean(self):
