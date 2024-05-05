@@ -10,10 +10,18 @@ from .views import (
     AcknowledgePurchaseOrderAPIView,
     PurchaseOrderByVendorAPIView,
 )
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 
 urlpatterns = [
-    path("login/", MyObtainTokenPairView.as_view(), name="token_obtain_pair"),
+    # URLs for Refresh Token
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # URLs for Login Authentication
+    path("login/", MyObtainTokenPairView.as_view(), name="my-token_obtain_pair"),
     path("logout/", LogoutView.as_view(), name="auth_logout"),
     # URLs for managing vendors
     path("vendors/", VendorListCreateAPIView.as_view(), name="vendor-list-create"),
