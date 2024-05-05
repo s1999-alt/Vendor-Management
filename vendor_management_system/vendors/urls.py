@@ -8,6 +8,7 @@ from .views import (
     MyObtainTokenPairView,
     LogoutView,
     AcknowledgePurchaseOrderAPIView,
+    PurchaseOrderByVendorAPIView,
 )
 
 
@@ -31,6 +32,12 @@ urlpatterns = [
         "purchase_orders/<int:pk>/",
         PurchaseOrderRetrieveUpdateDestroyAPIView.as_view(),
         name="purchase-order-retrieve-update-destroy",
+    ),
+     # New endpoint for listing purchase orders by vendor
+    path(
+        "purchase_orders/by_vendor/<int:vendor_id>/",
+        PurchaseOrderByVendorAPIView.as_view(),
+        name="purchase-order-by-vendor",
     ),
     # URL for retrieving vendor performance metrics
     path(

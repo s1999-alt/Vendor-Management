@@ -20,18 +20,21 @@ This project is a Vendor Management System developed using Django and Django RES
 https://github.com/s1999-alt/Vendor-Management.git
 ```
 
-2.Create and activate Environment:
+
+2.Path to Project File
+
+```bash
+ cd .\vendor_management_system\        
+```
+
+
+
+3.Create and activate Environment:
 ```bash
 python3 -m venv env
 
 windows : .env\Scripts\activate
 Linux   :  source env/bin/activate
-```
-
-3.Path to Project File
-
-```bash
- cd .\vendor_management_system\        
 ```
 
 4.Install dependencies:
@@ -59,15 +62,14 @@ python manage.py runserver
 
 
 ## Authentication
-To access the API endpoints, authentication is required.
+To access the API endpoints, authentication is required.Use this token as Bearer Token.
 
 1.Create a superuser:
 
 ```bash
 python manage.py createsuperuser
 ```
-
-
+Use Superuser Username and Password for Login.
 
 ## API Reference
 
@@ -95,7 +97,7 @@ After Login , We got an access token and refresh token, access token is required
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| `name` | `string` | **Required**. Vendor name |
+| `name` | `string` | **Required**. Vendor name (Only alphabets are allowed)|
 | `contact_details ` | `string` | **Required**. Vendor's contact details |
 | `address` | `string` | **Required**. address |
 | `vendor_code` | `string` | **Required**. vendor_code |
@@ -165,9 +167,9 @@ After Login , We got an access token and refresh token, access token is required
 | `items` | `json` | **Required**.  Items in the purchase order |
 | `quantity` | `integer` | **Required**. Total quantity of items|
 | `status` | `string` | **Required**. Status of the purchase order |
-| `quality_rating` | `integer` | **Required**. Rating given to the vendor |
-| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) (Current date comes automatically) |
-| `acknowledgment_date` | `string` | **Required**. acknowledgment_date (YYYY-MM-DD) |
+| `quality_rating` | `integer` |  Rating given to the vendor |
+| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) (choose issue date greater than or equal to order date and less than acknowledge date and also less than the delivery date) |
+| `acknowledgment_date` | `string` | acknowledgment_date (YYYY-MM-DD) (acknowledge date is greater than the issue date and less than the delivery date ) |
 
 
 #### 2. List all Purchase Orders
@@ -176,8 +178,18 @@ After Login , We got an access token and refresh token, access token is required
   GET /api/purchase_orders/
 ```
 
+#### 3. Retrieve purchase orders by vendor.
 
-#### 3. Retrieve details of a specific purchase order.
+```http
+  GET /api/purchase_orders/by_vendor/<int:vendor_id>/
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `vendor_id` | `integer` | **Required**. Vendor Id|
+
+
+#### 4. Retrieve details of a specific purchase order.
 
 ```http
   GET /api/purchase_orders/<po_id>/:
@@ -189,7 +201,7 @@ After Login , We got an access token and refresh token, access token is required
 
 
 
-#### 4. Update a purchase order.
+#### 5. Update a purchase order.
 
 ```http
   PUT /api/purchase_orders/<po_id>/
@@ -205,12 +217,12 @@ After Login , We got an access token and refresh token, access token is required
 | `items` | `json` | **Required**.  Items in the purchase order |
 | `quantity` | `integer` | **Required**. Total quantity of items|
 | `status` | `string` | **Required**. Status of the purchase order |
-| `quality_rating` | `integer` | **Required**. Rating given to the vendor |
-| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) (Current date comes automatically) |
+| `quality_rating` | `integer` | Rating given to the vendor |
+| `issue_date` | `string` | **Required**. issue_date (YYYY-MM-DD) |
 | `acknowledgment_date` | `string` | **Required**. acknowledgment_date (YYYY-MM-DD) |
 
 
-#### 5. Delete a Purchase Order
+#### 6. Delete a Purchase Order
 
 ```http
   DELETE /api/purchase_orders/<po_id>/

@@ -1,17 +1,22 @@
+import uuid
+from django.utils.timezone import now
 from django.db import models
 from datetime import datetime
 from django.db.models import Avg, Count
 from datetime import timedelta
-from django.utils.timezone import now
-import uuid
 from django.core.validators import MinValueValidator, MaxValueValidator, EmailValidator
 from django.core.exceptions import ValidationError
 import re
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Vendor(models.Model):
     name = models.CharField(max_length=100)
-    contact_details = models.TextField(max_length=10)
+    contact_details = models.CharField(max_length=10)
     address = models.TextField()
     vendor_code = models.CharField(max_length=50, unique=True)
     on_time_delivery_rate = models.FloatField(
@@ -29,18 +34,25 @@ class Vendor(models.Model):
 
     def clean(self):
         super().clean()
-        if not re.match(r"^\d{10}$", self.contact_details):
+        if not re.match(r"^\d+$", self.contact_details):
             raise ValidationError(
                 {"contact_details": "Contact details must contain exactly 10 digits."}
             )
+        if not self.name.isalpha():
+            raise ValidationError({"name": "Name must contain only alphabets."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # This will call the clean method
+        return super().save(*args, **kwargs)
 
     def calculate_on_time_delivery_rate(self):
         completed_pos = self.purchaseorder_set.filter(status="completed")
         total_completed_pos = completed_pos.count()
         if total_completed_pos == 0:
             return 0.0
+        grace_period_days = 7
         on_time_deliveries = completed_pos.filter(
-            delivery_date__lte=models.F("issue_date") + timedelta(days=1)
+            delivery_date__lte=models.F("issue_date") + timedelta(days=grace_period_days)
         ).count()
         return (on_time_deliveries / total_completed_pos) * 100
 
@@ -80,19 +92,23 @@ class Vendor(models.Model):
 
 
 class PurchaseOrder(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+    ]
     po_number = models.CharField(max_length=50, unique=True)
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     order_date = models.DateTimeField()
     delivery_date = models.DateTimeField()
     items = models.JSONField()
     quantity = models.IntegerField(validators=[MinValueValidator(1)])
-    status = models.CharField(max_length=50, default="pending")
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default="pending")
     quality_rating = models.FloatField(
         blank=True,
         null=True,
         validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
     )
-    issue_date = models.DateTimeField(auto_now_add=True)
+    issue_date = models.DateTimeField()
     acknowledgment_date = models.DateTimeField(blank=True, null=True)
 
     def clean(self):
@@ -108,21 +124,22 @@ class PurchaseOrder(models.Model):
             self.po_number = f"{date_prefix}-{unique_identifier}"
         super().save(*args, **kwargs)
 
-        if self.vendor_id:
-            self.vendor.on_time_delivery_rate = (
-                self.vendor.calculate_on_time_delivery_rate()
-            )
-            self.vendor.quality_rating_avg = (
-                self.vendor.calculate_quality_rating_average()
-            )
-            self.vendor.average_response_time = (
-                self.vendor.calculate_average_response_time()
-            )
-            self.vendor.fulfillment_rate = self.vendor.calculate_fulfillment_rate()
-            self.vendor.save()
-
     def __str__(self):
         return self.po_number
+    
+@receiver(post_save, sender=PurchaseOrder)
+def update_vendor_metrics(sender, instance, **kwargs):
+    if instance.vendor_id:
+        vendor = instance.vendor
+        vendor.quality_rating_avg = vendor.calculate_quality_rating_average()
+        vendor.average_response_time = vendor.calculate_average_response_time()
+        vendor.fulfillment_rate = vendor.calculate_fulfillment_rate()
+    if instance.status == 'completed':
+        logger.info(f"Updating on-time delivery rate for vendor {instance.vendor.id}")
+        on_time_rate = vendor.calculate_on_time_delivery_rate()
+        logger.info(f"On-time delivery rate: {on_time_rate}")
+        vendor.on_time_delivery_rate = on_time_rate
+    vendor.save()
 
 
 class HistoricalPerfomance(models.Model):
